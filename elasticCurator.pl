@@ -327,7 +327,9 @@ if (defined $logincredentials) {
 	($username, $password) = split /:/, $login;	
 	$req->authorization_basic($username, $password);
 }
+
 my $res = $ua->request($req);
+
 if(! $res->is_success) {
         syslog('err', "ERROR, query for elasticsearch data!");
         print "\n\tERROR getting elasticsearch data!\n";
@@ -383,7 +385,7 @@ foreach my $index (sort keys %{ $data->{'routing_table'}->{'indices'} }) {
                         print "\n\t$index is not defined i configurationfile $configfile or in the ignore list. $index will be DELETED...\n";
                         syslog('info', "Unknown index $index, Not defined i configurationfile $configfile. $index will be DELETED...");
                         $req = HTTP::Request->new(DELETE => "$api_node/$index");
-			$req->authorization_basic($username, $password);
+			$req->authorization_basic($username, $password) if (defined $logincredentials);
 			$ua->request($req) unless $configtest;
                         print "\n\t> > Deleted index $index";
                         syslog('info', "Deleted index $index");
@@ -403,7 +405,7 @@ foreach my $index (sort keys %{ $data->{'routing_table'}->{'indices'} }) {
                 if($config->{'index_lifetime'}->{$index_name} < $days) {
 
                         $req = HTTP::Request->new(DELETE => "$api_node/$index");
-			$req->authorization_basic($username, $password);
+			$req->authorization_basic($username, $password) if (defined $logincredentials);
 			$res = $ua->request($req) unless $configtest;
 
 			if(! $res->is_success) {
@@ -496,7 +498,7 @@ if (scalar @optimize > 0 && $do_optimize) {
                 print "\n\tOPTIMIZE \"$optimize\"\n";
                 syslog('info', "OPTIMIZE \"$optimize\"");
                 $req = HTTP::Request->new(POST => "$api_node/$optimize/_forcemerge?max_num_segments=1");
-		$req->authorization_basic($username, $password);
+		$req->authorization_basic($username, $password) if (defined $logincredentials);
                 $ua->request($req) unless $configtest;
         }
 
@@ -514,7 +516,7 @@ if (scalar @reroute > 0 && $do_reroute) {
 		my $req = HTTP::Request->new( 'PUT', $uri );
 		$req->header( 'Content-Type' => 'application/json' );
 		$req->content( $json );
-		$req->authorization_basic($username, $password);
+		$req->authorization_basic($username, $password) if (defined $logincredentials);
                 $ua->request($req) unless $configtest;
         }
 	$feedback .= "\n\n\tRerouted Indexes=> " . join(',', @reroute) if scalar(@reroute) > 0;
