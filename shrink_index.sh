@@ -35,10 +35,10 @@ usage() {
         - Default: ""
         - Required: False
 
-    -h  Elasticsearch host; ex) https://elastic.got.company.net:9200
+    -h  Elasticsearch host; ex) https://elastic.company.net:9200
         - Default: http://127.0.0.1:9200
         - Required: False
-        - ex using auth) https://user:pwd@elastic.got.company.net:9200
+        - ex using auth) https://user:pwd@elastic.company.net:9200
 
     -y  Disables interactive mode
 
